@@ -1,0 +1,64 @@
+﻿@model GenerationViewModel
+
+@{
+	ViewData["Title"] = "Generation " + Model.Generation;
+}
+
+<div class="flex flex-col w-5/6 my-16 gap-2">
+	<div class="flex flex-row w-full gap-4">
+		<input type="text" class="flex-grow border rounded-md p-2" id="pokemon-search" placeholder="Search for a Pokémon..." />
+	</div>
+    <div class="flex flex-wrap flex-row gap-2" id="pokemon-view">
+    </div>
+		<div class="flex">
+			@if (Model.Generation > 1)
+			{
+				<a class="rounded-md border bg-blue-400 p-4" href="@Url.Action("Index", "Home", new { generation = Model.Generation - 1 })">
+					Previous Generation
+				</a>
+			}
+			<div class="flex-grow"></div>
+			@if (Model.Generation < 6)
+			{
+				<a class="rounded-md border bg-blue-400 p-4" href="@Url.Action("Index", "Home", new { generation = Model.Generation + 1 })">
+					Next Generation
+				</a>
+			}
+		</div>
+</div>
+
+@section scripts {
+	<script>
+		$(document).ready(function () {
+			loadView();
+	
+			function loadView(query) {
+				// Serialize the C# model to JSON and assign it to a JavaScript variable
+				const modelData = @Html.Raw(Json.Serialize(Model.PokemonData));
+
+				// Use JSON.stringify to convert the modelData to a JSON string
+				const serializedModelData = JSON.stringify(modelData);
+
+				// Then send the serialized model data to the server
+				$.ajax({
+					url: "@Url.Action("ShowGeneration", "Home")",
+					method: "POST",
+					data: { pokemonData: serializedModelData, query },
+					success: function (data) {
+							$("#pokemon-view").html(data);
+					},
+					error: function (err) {
+							console.log(err);
+					}
+				});
+			}
+			
+			// Register an event handler for the input event on the search box
+			// Then call loadView with the search term
+			$('#pokemon-search').on('input', function () {
+				const searchTerm = $(this).val().trim().toLowerCase();
+				loadView(searchTerm);
+			});
+		});
+	</script>
+}

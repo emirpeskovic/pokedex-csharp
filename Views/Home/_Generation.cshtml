@@ -1,0 +1,11 @@
+@model IEnumerable<SimplePokemonViewModel>
+
+@foreach (var pokemon in Model)
+{
+	<div class="flex flex-col rounded-md border p-2 text-center">
+		<a href="/pokemon/@pokemon.Id">
+			<img src="@pokemon.ImageURL" width="96" height="96" alt="@pokemon.Name"/>
+			@pokemon.Name
+		</a>
+	</div>
+}
